@@ -1,8 +1,14 @@
 package vn.tmt.homework.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,4 +36,39 @@ public class handlerException {
         return err;
     }
 
+    @ExceptionHandler(value = {HttpMessageNotReadableException.class, MethodArgumentNotValidException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, Object> baRequest(Exception ex) {
+        Map<String, Object> err = new HashMap<>();
+        err.put("code", "002");
+        err.put("message", ex.getMessage());
+        return err;
+    }
+
+    @ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class})
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, Object> conflict(Exception ex) {
+        Map<String, Object> err = new HashMap<>();
+        err.put("code", "003");
+        err.put("message", ex.getMessage());
+        return err;
+    }
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public Map<String, Object> methodNotSupport(Exception ex) {
+        Map<String, Object> err = new HashMap<>();
+        err.put("code", "001");
+        err.put("message", ex.getMessage());
+        err.put("time", new Date());
+        return err;
+    }
+    @ExceptionHandler(value = NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String,Object> notFoundException(Exception ex){
+        Map<String, Object> err = new HashMap<>();
+        err.put("code", "004");
+        err.put("message", ex.getMessage());
+        err.put("time", new Date());
+        return err;
+    }
 }
